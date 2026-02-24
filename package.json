@@ -1,0 +1,25 @@
+{
+  "name": "micost",
+  "version": "1.0.0",
+  "description": "fcking clone micost melaka website",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayoqill/Micost.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ayoqill/Micost/issues"
+  },
+  "homepage": "https://github.com/ayoqill/Micost#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
