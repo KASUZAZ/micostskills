@@ -1,0 +1,136 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin MiCoSTSkills",
+      "email": "admin@micostskills.local",
+      "password": "$2b$10$uTOWhJZIanjV2HD46ivzgOYkax4DOOmwoU8wSljBb2PPSu0O.hIyq",
+      "role": "admin",
+      "program": "Management",
+      "created_at": "2026-05-25T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "MOHAMMAD AMY BIN MD ALI",
+      "email": "Amy@micost.edu.my",
+      "password": "$2b$10$lcOcafTIJjhei7r8Eyt9S..dgYd0MSAYsEf29LBRmlJF54vsDgHNC",
+      "role": "lecturer",
+      "program": "Lecturer Portal",
+      "created_at": "2026-05-26T00:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "name": "SARJUDIN BIN ZAINI YEE",
+      "email": "Sarjudin@micost.edu.my",
+      "password": "$2b$10$lcOcafTIJjhei7r8Eyt9S..dgYd0MSAYsEf29LBRmlJF54vsDgHNC",
+      "role": "lecturer",
+      "program": "Lecturer Portal",
+      "created_at": "2026-05-26T00:00:00.000Z"
+    },
+    {
+      "id": 9,
+      "name": "IZAH BINTI MD JEDI",
+      "email": "Izah@micost.edu.my",
+      "password": "$2b$10$lcOcafTIJjhei7r8Eyt9S..dgYd0MSAYsEf29LBRmlJF54vsDgHNC",
+      "role": "lecturer",
+      "program": "Lecturer Portal",
+      "created_at": "2026-05-26T00:00:00.000Z"
+    },
+    {
+      "id": 10,
+      "name": "IRNA NADIRA BINTI MAHZAN",
+      "email": "Irna@micost.edu.my",
+      "password": "$2b$10$lcOcafTIJjhei7r8Eyt9S..dgYd0MSAYsEf29LBRmlJF54vsDgHNC",
+      "role": "lecturer",
+      "program": "Lecturer Portal",
+      "created_at": "2026-05-26T00:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "name": "MUHAMMAD AIZUL HAZIQ BIN AB RAZAK",
+      "email": "legacyempires3@gmail.com",
+      "password": "$2b$10$8YgLk7ErqdgnnSbdminQIexdGUAM71BCO4Lso0zgF1zZlGDUCd0v6",
+      "role": "student",
+      "program": "IT-020-4:2013 Pentadbiran Sistem Komputer",
+      "profile": {},
+      "created_at": "2026-06-10T06:22:43.220Z"
+    },
+    {
+      "id": 7,
+      "name": "MUHAMAD SHAHRIL BIN AZLIN SHAH",
+      "email": "shah96ril@gmail.com",
+      "password": "$2b$10$wTCDffA3ajjtJVS2CFaE6eFrR/48ByZtr4LgqquyJN2Fxb1Qp53xu",
+      "role": "student",
+      "program": "IT-020-4:2013 Pentadbiran Sistem Komputer",
+      "profile": {
+        "ic": "030829-14-1057",
+        "batch": "DKM Batch 3",
+        "verified_registry": true,
+        "verified_at": "2026-06-10T06:35:50.718Z"
+      },
+      "created_at": "2026-06-10T06:35:50.718Z"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "title": "Operasi Sistem Komputer",
+      "description": "Modul asas sistem komputer, troubleshooting dan networking.",
+      "lecturer": "Pensyarah IT",
+      "status": "active",
+      "created_at": "2026-05-25T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Pemasangan Elektrik",
+      "description": "Modul asas pemasangan dan penyelenggaraan elektrik.",
+      "lecturer": "Pensyarah Elektrik",
+      "status": "active",
+      "created_at": "2026-05-25T00:00:00.000Z"
+    }
+  ],
+  "attendance": [
+    {
+      "id": 2,
+      "user_id": 6,
+      "date": "2026-06-10",
+      "status": "Hadir",
+      "wifi_ssid": "@MiCoSTHotSpotD_2n3",
+      "created_at": "2026-06-10T06:32:15.554Z"
+    },
+    {
+      "id": 3,
+      "user_id": 7,
+      "date": "2026-06-10",
+      "status": "Hadir",
+      "wifi_ssid": "@MiCoSTHotSpotD_2n3",
+      "created_at": "2026-06-10T06:36:15.697Z"
+    }
+  ],
+  "exams": [],
+  "results": [
+    {
+      "id": 2,
+      "user_id": 6,
+      "exam_id": "final-komputer",
+      "title": "Final Exam TVET Sistem Komputer",
+      "course": "komputer",
+      "score": 100,
+      "correct": 60,
+      "total_questions": 60,
+      "certificate_id": "MICOST-KOMPUTER-6-MQW9SA1D",
+      "status": "Lulus",
+      "created_at": "2026-06-27T11:21:44.403Z"
+    }
+  ],
+  "finance_accounts": [],
+  "cms_pages": [],
+  "notifications": [
+    {
+      "id": 1,
+      "title": "Welcome",
+      "message": "Selamat datang ke MiCoSTSkills Student Portal.",
+      "created_at": "2026-05-25T00:00:00.000Z"
+    }
+  ]
+}
