@@ -983,3 +983,37 @@ function loadAiChatAndWhatsAppBot() {
 }
 
 document.addEventListener("DOMContentLoaded", loadSharedComponents);
+
+(function startSecurityPresenceTracker() {
+  const localPreviewPorts = ["5500", "5501", "5502", "4173"];
+  const apiOrigin = window.location.protocol === "file:" || localPreviewPorts.includes(window.location.port)
+    ? "http://localhost:3000"
+    : window.location.origin;
+  const sessionKey = "micost_security_visitor_session";
+  let sessionId = sessionStorage.getItem(sessionKey);
+  if (!sessionId) {
+    sessionId = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    sessionStorage.setItem(sessionKey, sessionId);
+  }
+
+  function heartbeat() {
+    return fetch(`${apiOrigin}/api/live-visitors/heartbeat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, path: window.location.pathname || "/" }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
+  function leave() {
+    const body = JSON.stringify({ sessionId });
+    const url = `${apiOrigin}/api/live-visitors/leave`;
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
+    }
+  }
+
+  heartbeat();
+  window.setInterval(heartbeat, 20000);
+  window.addEventListener("pagehide", leave);
+})();

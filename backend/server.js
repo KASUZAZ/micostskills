@@ -7,6 +7,7 @@ const path = require("path");
 const { execFile } = require("child_process");
 const { getExamQuestions } = require("./elearning-question-bank");
 const { createAppStorage } = require("./storage");
+const { createSecurityTelemetry } = require("./security-telemetry");
 
 function loadLocalEnv() {
   const envPath = [
@@ -43,6 +44,7 @@ const DATA_FILE = path.join(BACKEND_DIR, "data", "local-data.json");
 const STUDENT_REGISTRY_FILE = path.join(BACKEND_DIR, "data", "student-registry.json");
 const LECTURER_REGISTRY_FILE = path.join(BACKEND_DIR, "data", "lecturer-registry.json");
 const JWT_SECRET = process.env.JWT_SECRET || "MICOSTSKILLS_LOCAL_DEV_SECRET";
+const securityTelemetry = createSecurityTelemetry({ hashSecret: JWT_SECRET });
 const MICOST_WIFI_SSID = "@MiCoSTHotSpotD_2n3";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
@@ -127,6 +129,32 @@ app.use(cors({
   },
 }));
 app.use(express.json());
+
+app.use(async (req, res, next) => {
+  const pathName = String(req.path || "/").toLowerCase();
+  const ignored = pathName.startsWith("/assets/")
+    || pathName.startsWith("/dist/")
+    || pathName.startsWith("/api/live-visitors")
+    || pathName === "/api/security/traffic"
+    || /\.(?:css|js|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|map)$/i.test(pathName);
+
+  if (ignored) return next();
+
+  try {
+    const result = await securityTelemetry.recordAccess(req);
+    if (!String(req.headers.cookie || "").includes("micost_security_session=")) {
+      res.cookie("micost_security_session", result.sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+    }
+  } catch (error) {
+    console.error(`Security telemetry write failed: ${error.message}`);
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   const host = String(req.headers.host || "").toLowerCase();
@@ -713,6 +741,7 @@ app.get("/api/health", (_req, res) => {
     ok: true,
     app: "MiCoSTSkills Enterprise",
     storage: appStorage.status(),
+    securityTelemetry: securityTelemetry.status(),
     time: now(),
   });
 });
@@ -728,7 +757,7 @@ app.get("/api/live-visitors", (_req, res) => {
   res.json(liveVisitorSummary());
 });
 
-app.post("/api/live-visitors/heartbeat", (req, res) => {
+app.post("/api/live-visitors/heartbeat", async (req, res) => {
   resetLiveVisitorDailyCountIfNeeded();
 
   const sessionId = String(req.body?.sessionId || "").trim().slice(0, 80);
@@ -738,6 +767,12 @@ app.post("/api/live-visitors/heartbeat", (req, res) => {
 
   const pathName = sanitizeVisitorPath(req.body?.path);
   const existingVisitor = liveVisitors.get(sessionId);
+
+  try {
+    await securityTelemetry.recordHeartbeat(req, sessionId, pathName);
+  } catch (error) {
+    console.error(`Visitor telemetry heartbeat failed: ${error.message}`);
+  }
 
   if (!existingVisitor) {
     const visitor = {
@@ -758,9 +793,15 @@ app.post("/api/live-visitors/heartbeat", (req, res) => {
   res.json(liveVisitorSummary());
 });
 
-app.post("/api/live-visitors/leave", (req, res) => {
+app.post("/api/live-visitors/leave", async (req, res) => {
   const sessionId = String(req.body?.sessionId || "").trim().slice(0, 80);
   const visitor = liveVisitors.get(sessionId);
+
+  try {
+    await securityTelemetry.recordLeave(req, sessionId);
+  } catch (error) {
+    console.error(`Visitor telemetry leave failed: ${error.message}`);
+  }
 
   if (visitor) {
     liveVisitors.delete(sessionId);
@@ -783,6 +824,23 @@ app.get("/api/live-visitors/stream", (req, res) => {
   req.on("close", () => {
     liveVisitorClients.delete(res);
   });
+});
+
+app.get("/api/security/traffic", async (req, res) => {
+  res.setHeader("Cache-Control", "private, no-store, max-age=0");
+  if (!securityTelemetry.status().protectedFeed) {
+    return res.status(503).json({ error: "CyberGuard connector is not configured." });
+  }
+  if (!securityTelemetry.authorize(req)) {
+    return res.status(401).json({ error: "Unauthorized telemetry request." });
+  }
+
+  try {
+    return res.json(await securityTelemetry.getTrafficFeed());
+  } catch (error) {
+    console.error(`Security telemetry read failed: ${error.message}`);
+    return res.status(503).json({ error: "Security telemetry is temporarily unavailable." });
+  }
 });
 
 app.get("/api/me", auth, (req, res) => {
