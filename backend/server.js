@@ -54,6 +54,22 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self' https:",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self' https: wss:",
+  "frame-src https:",
+  "media-src 'self' blob: https:",
+  "worker-src 'self' blob:",
+  "upgrade-insecure-requests",
+].join("; ");
 
 if (process.env.NODE_ENV === "production" && JWT_SECRET === "MICOSTSKILLS_LOCAL_DEV_SECRET") {
   throw new Error("JWT_SECRET must be set in production.");
@@ -117,6 +133,21 @@ const liveVisitorClients = new Set();
 const liveVisitorEvents = [];
 let liveVisitorTotalToday = 0;
 let liveVisitorDateKey = new Date().toISOString().slice(0, 10);
+
+app.disable("x-powered-by");
+app.use((_req, res, next) => {
+  res.setHeader("Content-Security-Policy", CONTENT_SECURITY_POLICY);
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader(
+    "Permissions-Policy",
+    "browsing-topics=(), camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+  );
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  next();
+});
 
 app.use(cors({
   origin(origin, callback) {
