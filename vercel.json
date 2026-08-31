@@ -44,6 +44,10 @@
   ],
   "rewrites": [
     {
+      "source": "/favicon.ico",
+      "destination": "/resources/logo-micostskills.png"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/index.js"
     }
